@@ -1,0 +1,33 @@
+{
+  "author": "",
+  "bin": {
+    "mockserve": "bin/mockserve"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "express": "^4.13.3"
+  },
+  "description": "",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "f5fcfb68170cb1868a31a68d88629e7ede570e2a",
+    "tarball": "https://registry.npmjs.org/mockserve/-/mockserve-1.0.7.tgz"
+  },
+  "gitHead": "e3d577ea4c0f0acbf6dbf3eb174bcc3e24c2de20",
+  "license": "ISC",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "email": "peter@hertigcarl.se",
+      "name": "peterhel"
+    }
+  ],
+  "name": "mockserve",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.7"
+}

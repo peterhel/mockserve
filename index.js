@@ -1,5 +1,6 @@
 /* global __dirname */
 var colors = require('colors');
+var debug = require('debug')('mockserve');
 var fs = require('fs');
 var _path = require('path');
 var Mocks = function(testSession) {
@@ -12,13 +13,13 @@ var Mocks = function(testSession) {
         if (!self._mocks[rxp]) {
             self._mocks[rxp] = [];
         }
-        console.log('    addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
+        debug('    addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
         self._mocks[rxp].push({
             status: status,
             content: response,
             headers: headers
         });
-        console.log(`        ${self._mocks[rxp].length} mocks total.`)
+        debug(`        ${self._mocks[rxp].length} mocks total.`)
     };
 
     this.getUnusedMocks = function() {
@@ -35,14 +36,14 @@ var Mocks = function(testSession) {
 
     this.consume = function(path) {
         let mock;
-        console.log('    consume -> %s', path);
+        debug('    consume -> %s', path);
 
         for(let rxpl in self._mocks) {
             const rxp = rxpl.substr(1, rxpl.length -2);
         //Object.keys(self._mocks).forEach(function(rxp) {
             let apaj = new RegExp(rxp);
             let isMatch = apaj.test(`${path}`);
-            console.log(`        -> ${apaj}.test('${path}') === ${isMatch}`);
+            debug(`        -> ${apaj}.test('${path}') === ${isMatch}`);
             if (isMatch === true) {
                 mock = self._mocks[rxpl].shift();
                 break;
@@ -58,14 +59,14 @@ var Mocks = function(testSession) {
                     encoding: 'utf-8'
                 });
                 var content = JSON.parse(contentString);
-                console.log('    INFO: using implicit mock at: ' + filename.green);
+                debug('    INFO: using implicit mock at: ' + filename.green);
                 mock = {
                     status: 200,
                     content: content
                 };
             } catch (e) {
-                console.log('    ' + e);
-                console.log('    ERROR: no implicit mock at: ' + filename.red);
+                debug('    ' + e);
+                debug('    ERROR: no implicit mock at: ' + filename.red);
             }
         }
 
@@ -73,10 +74,10 @@ var Mocks = function(testSession) {
         if (testSession) {
             // All responses must be mocked for each request
             //delete self._mocks[path];
-            //console.log('        delete self._mocks[%s]', path);
+            //debug('        delete self._mocks[%s]', path);
         }
 
-        console.log('        return mock data' /*, mock*/ );
+        debug('        return mock data' /*, mock*/ );
         return mock;
     };
 };
@@ -93,11 +94,11 @@ app.use(function(req, res, next) {
     } else {
         res.setHeader('Content-Type', 'application/json');
     }
-    console.log('MOCK-SERVER incoming: ', req.method, req.url);
+    debug('MOCK-SERVER incoming: ', req.method, req.url);
     var response = mocks.consume(req.url);
     if (!response) {
 
-        console.log('    ERROR: No mock exists for: ' + (req.method + ' ' + req.url).red);
+        debug('    ERROR: No mock exists for: ' + (req.method + ' ' + req.url).red);
         res.status(501).end(JSON.stringify({
             message: '    No mocked content for: ' + req.url
         }));
@@ -105,7 +106,7 @@ app.use(function(req, res, next) {
         if (response.headers) {
             for (var hKey in response.headers) {
                 res.setHeader(hKey, response.headers[hKey]);
-                console.log('            with response header: %s=%s ', hKey, response.headers[hKey]);
+                debug('            with response header: %s=%s ', hKey, response.headers[hKey]);
             }
         }
         res.status(response.status);
@@ -119,7 +120,7 @@ app.use(function(req, res, next) {
     }
 
     next();
-    //console.log(req.url + ' -> ' + (body.length < 1024 ? body : 'Lång json-sträng'));
+    //debug(req.url + ' -> ' + (body.length < 1024 ? body : 'Lång json-sträng'));
 });
 
 var server = null;
@@ -130,7 +131,7 @@ function startServer() {
         var host = server.address().address;
         var port = server.address().port;
 
-        console.log('Example app listening at http://%s:%s', host, port);
+        debug('Example app listening at http://%s:%s', host, port);
     });
 }
 
@@ -150,10 +151,10 @@ module.exports.stop = function() {
     'use strict';
     var unusedMocks = mocks.getUnusedMocks();
 
-    console.log('unused mocks: ' + unusedMocks.length);
+    debug('unused mocks: ' + unusedMocks.length);
 
     if (unusedMocks.length) {
-        console.log(unusedMocks);
+        debug(unusedMocks);
     }
 
     server.close();

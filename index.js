@@ -13,7 +13,7 @@ var Mocks = function(testSession) {
         if (!self._mocks[rxp]) {
             self._mocks[rxp] = [];
         }
-        debug('    addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
+        debug('addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
         self._mocks[rxp].push({
             status: status,
             content: response,
@@ -36,16 +36,22 @@ var Mocks = function(testSession) {
 
     this.consume = function(path) {
         let mock;
-        debug('    consume -> %s', path);
 
         for(let rxpl in self._mocks) {
             const rxp = rxpl.substr(1, rxpl.length -2);
-        //Object.keys(self._mocks).forEach(function(rxp) {
             let apaj = new RegExp(rxp);
             let isMatch = apaj.test(`${path}`);
-            debug(`        -> ${apaj}.test('${path}') === ${isMatch}`);
+            debug(`Matching: ${apaj}.test('${path}') === ${isMatch}`);
             if (isMatch === true) {
-                mock = self._mocks[rxpl].shift();
+                //debug(self._mocks[rxpl])
+                if(self._mocks[rxpl].length === 0) {
+                    throw new Error(`You've run out of mocks!`);
+                }
+                mock = self._mocks[rxpl].pop();
+                debug(mock);
+                if(!mock) {
+                    throw new Error('Could not extract value from property.')
+                }
                 break;
             }
         }
@@ -77,7 +83,7 @@ var Mocks = function(testSession) {
             //debug('        delete self._mocks[%s]', path);
         }
 
-        debug('        return mock data' /*, mock*/ );
+        debug('returning mock'/*, mock*/);
         return mock;
     };
 };
@@ -94,7 +100,7 @@ app.use(function(req, res, next) {
     } else {
         res.setHeader('Content-Type', 'application/json');
     }
-    debug('MOCK-SERVER incoming: ', req.method, req.url);
+    debug(`${req.method} ${req.url}`);
     var response = mocks.consume(req.url);
     if (!response) {
 
@@ -115,6 +121,7 @@ app.use(function(req, res, next) {
             return res.end(response.content);
         } else {
             var body = JSON.stringify(response.content);
+            debug(body);
             res.end(body);
         }
     }

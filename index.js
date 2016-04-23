@@ -34,6 +34,10 @@ var Mocks = function(testSession) {
         return unused;
     };
 
+    this.clean = function() {
+        this._mocks = {};
+    };
+
     this.consume = function(path) {
         let mock;
 

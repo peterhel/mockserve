@@ -21,4 +21,23 @@ it('is json', done => {
 		JSON.parse(c)
 		done()
 	});
+});
+
+it('is json and added as an object', done => {
+	mockserve.addMock('/json', 200, {
+		"type": "json"
+	});
+	request.get('http://localhost:4129/json', (a, b, c) => {
+		expect(b.headers['content-type']).to.equal('application/json');
+		JSON.parse(c)
+		done()
+	});
+});
+
+it('can get implicit', done => {
+	request.get('http://localhost:4129/implicit', (a, b, c) => {
+		expect(b.headers['content-type']).to.equal('application/json');
+		expect(JSON.parse(c).whoami).to.equal('implicitmock!');		
+		done()
+	});
 })

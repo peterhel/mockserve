@@ -9,6 +9,7 @@ var Mocks = function(testSession) {
     this._mocks = {};
 
     this.addMock = function(path, status, response, headers) {
+        const content = typeof(response) === 'object' ? JSON.stringify(response) : response;
         const rxp = new RegExp(path).toString();
         if (!self._mocks[rxp]) {
             self._mocks[rxp] = [];
@@ -16,7 +17,7 @@ var Mocks = function(testSession) {
         debug('addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
         self._mocks[rxp].push({
             status: status,
-            content: response,
+            content: content,
             headers: headers
         });
         debug(`        ${self._mocks[rxp].length} mocks total.`)
@@ -119,6 +120,7 @@ app.use(function(req, res, next) {
                 debug('            with response header: %s=%s ', hKey, response.headers[hKey]);
             }
         }
+        
         res.status(response.status);
 
         if(response.content.startsWith && !response.content.startsWith('{')) {

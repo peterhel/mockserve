@@ -9,6 +9,7 @@
   },
   "description": "",
   "devDependencies": {
+    "chai": "^3.5.0",
     "request": "^2.74.0"
   },
   "directories": {},

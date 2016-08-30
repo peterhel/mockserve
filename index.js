@@ -121,7 +121,7 @@ app.use(function(req, res, next) {
         }
         res.status(response.status);
 
-        if(!response.content.startsWith('{')) {
+        if(response.content.startsWith && !response.content.startsWith('{')) {
             res.setHeader('Content-Type', 'text/plain;charset=UTF-8');
         }
 

@@ -109,9 +109,6 @@ app.use(function(req, res, next) {
     if (!response) {
 
         debug('    ERROR: No mock exists for: ' + (req.method + ' ' + req.url).red);
-        if(!response.content.startsWith('{')) {
-            res.setHeader('Content-Type', 'text/plain');
-        }
         res.status(501).end(JSON.stringify({
             message: '    No mocked content for: ' + req.url
         }));
@@ -123,6 +120,10 @@ app.use(function(req, res, next) {
             }
         }
         res.status(response.status);
+
+        if(!response.content.startsWith('{')) {
+            res.setHeader('Content-Type', 'text/plain;charset=UTF-8');
+        }
 
         if (isJavaScript) {
             return res.end(response.content);

@@ -68,7 +68,7 @@ var Mocks = function(testSession) {
                 var contentString = fs.readFileSync(filename, {
                     encoding: 'utf-8'
                 });
-                var content = JSON.parse(contentString);
+                var content = contentString;
                 debug('    INFO: using implicit mock at: ' + filename.green);
                 mock = {
                     status: 200,
@@ -109,6 +109,9 @@ app.use(function(req, res, next) {
     if (!response) {
 
         debug('    ERROR: No mock exists for: ' + (req.method + ' ' + req.url).red);
+        if(!response.content.startsWith('{')) {
+            res.setHeader('Content-Type', 'text/plain');
+        }
         res.status(501).end(JSON.stringify({
             message: '    No mocked content for: ' + req.url
         }));

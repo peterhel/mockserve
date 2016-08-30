@@ -8,7 +8,9 @@
     "express": "^4.13.3"
   },
   "description": "",
-  "devDependencies": {},
+  "devDependencies": {
+    "request": "^2.74.0"
+  },
   "directories": {},
   "dist": {
     "shasum": "f5fcfb68170cb1868a31a68d88629e7ede570e2a",

@@ -127,7 +127,7 @@ app.use(function(req, res, next) {
         if (isJavaScript) {
             return res.end(response.content);
         } else {
-            var body = JSON.stringify(response.content);
+            var body = response.content;
             debug(body);
             res.end(body);
         }

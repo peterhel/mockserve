@@ -144,7 +144,7 @@ var server = null;
 
 function startServer() {
     'use strict';
-    server = app.listen(process.env.PORT || 4129, function() {
+    server = app.listen(process.env.MOCKPORT || 4129, function() {
         var host = server.address().address;
         var port = server.address().port;
 

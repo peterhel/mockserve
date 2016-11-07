@@ -111,7 +111,8 @@ app.use(function(req, res, next) {
 
         debug('    ERROR: No mock exists for: ' + (req.method + ' ' + req.url).red);
         res.status(501).end(JSON.stringify({
-            message: '    No mocked content for: ' + req.url
+            message: 'No mock was found',
+            path: req.url
         }));
     } else {
         if (response.headers) {
@@ -120,7 +121,7 @@ app.use(function(req, res, next) {
                 debug('            with response header: %s=%s ', hKey, response.headers[hKey]);
             }
         }
-        
+
         res.status(response.status);
 
         if(response.content.startsWith && !response.content.startsWith('{')) {

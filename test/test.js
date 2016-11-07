@@ -36,8 +36,9 @@ it('is json and added as an object', done => {
 
 it('can get implicit', done => {
 	request.get('http://localhost:4129/implicit', (a, b, c) => {
+		console.log(c)
 		expect(b.headers['content-type']).to.equal('application/json');
-		expect(JSON.parse(c).whoami).to.equal('implicitmock!');		
+		expect(JSON.parse(c).path).to.equal('/implicit');
 		done()
 	});
 })

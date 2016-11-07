@@ -1,8 +1,15 @@
-var mockserve = require('../index.js')
+let mockserve;
 var request = require('request');
 var chai = require('chai');
 var expect = chai.expect;
 
+beforeEach(() => {
+	mockserve = require('../index.js')
+});
+
+afterEach(() => {
+	mockserve.stop();
+});
 
 it('is plain', done => {
 	mockserve.addMock('/plain', 200, 'I am plains texts.');

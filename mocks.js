@@ -1,5 +1,6 @@
 const debug = require('debug')('mockserve:mocks');
-var _path = require('path');
+const _path = require('path');
+const fs = require('fs');
 
 var Mocks = function(testSession) {
     'use strict';

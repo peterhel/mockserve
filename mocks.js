@@ -7,7 +7,7 @@ var Mocks = function(testSession) {
     var self = this;
     this._mocks = {};
 
-    this.addMock = function(path, status, response, headers) {
+    this.addMock = function(path, status, response, headers, keep) {
         const content = typeof(response) === 'object' ? JSON.stringify(response) : response;
         const rxp = new RegExp(path).toString();
         if (!self._mocks[rxp]) {
@@ -15,9 +15,10 @@ var Mocks = function(testSession) {
         }
         debug('addMock -> %s, %s, %s', path, status, (headers && JSON.stringify(headers)) || '[]');
         self._mocks[rxp].push({
-            status: status,
-            content: content,
-            headers: headers
+            status,
+            content,
+            headers,
+            keep
         });
         debug(`        ${self._mocks[rxp].length} mocks total.`)
     };
@@ -52,6 +53,9 @@ var Mocks = function(testSession) {
                     throw new Error(`You've run out of mocks!`);
                 }
                 mock = self._mocks[rxpl].pop();
+                if (mock.keep === true) {
+                    self._mocks[rxpl].push(mock);
+                }
                 debug(mock);
                 if (!mock) {
                     throw new Error('Could not extract value from property.')

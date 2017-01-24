@@ -53,6 +53,7 @@ var Mocks = function(testSession) {
                     throw new Error(`You've run out of mocks!`);
                 }
                 mock = self._mocks[rxpl].pop();
+                console.log(mock)
                 if (mock.keep === true) {
                     self._mocks[rxpl].push(mock);
                 }

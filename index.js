@@ -97,8 +97,8 @@ class Server {
         });
     }
 
-    addMock(path, status, response, headers) {
-        this.mocks.addMock(path, status, response, headers);
+    addMock(path, status, response, headers, keep) {
+        this.mocks.addMock(path, status, response, headers, keep);
     }
 
     stop() {

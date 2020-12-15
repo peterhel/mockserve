@@ -67,21 +67,38 @@ var Mocks = function(testSession) {
 
         if (!mock) {
             //no explicit mock. check for implicit mock.
-            var filename = _path.resolve(process.cwd(), 'mocks') + path.toLowerCase().replace(/[?&=:]/g, '-').replace('//', '/') + '.json';
+            var body_filename = _path.resolve(process.cwd(), 'mocks') + path.toLowerCase().replace(/[?&=:]/g, '-').replace('//', '/') + '.body.json';
+            var headers_filename = _path.resolve(process.cwd(), 'mocks') + path.toLowerCase().replace(/[?&=:]/g, '-').replace('//', '/') + '.headers.json';
 
             try {
-                var contentString = fs.readFileSync(filename, {
-                    encoding: 'utf-8'
-                });
-                var content = contentString;
-                debug('    INFO: using implicit mock at: ' + filename.green);
+                let content;
+                let headers;
+                if(!fs.existsSync(body_filename)) {
+                    debug('    ERROR: no content at: ' + body_filename.yellow);
+                } else {
+                    debug('    INFO: using content from: ' + body_filename.green);
+                    content = fs.readFileSync(body_filename, {
+                        encoding: 'utf-8'
+                    });
+                }
+                if(!fs.existsSync(headers_filename)) {
+                    debug('    ERROR: no headers at: ' + headers_filename.yellow);
+                } else {
+                    debug('    INFO: using headers from: ' + headers_filename.green);
+                    let strHeaders = fs.readFileSync(headers_filename, {
+                        encoding: 'utf-8'
+                    });
+                    headers = JSON.parse(strHeaders)
+                }
+
                 mock = {
                     status: 200,
-                    content: content
+                    content,
+                    headers
                 };
             } catch (e) {
+                console.error(e)
                 debug('    ' + e);
-                debug('    ERROR: no implicit mock at: ' + filename.red);
             }
         }
 

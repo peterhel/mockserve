@@ -1,3 +1,8 @@
 #!/usr/bin/env node
 var Server = require('../index.js').Server;
-new Server().start();
+let server = new Server()
+process.on('SIGINT', () => {
+    server.stop();
+})
+
+server.start();

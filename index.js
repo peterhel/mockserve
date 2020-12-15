@@ -11,10 +11,13 @@ class Server {
         this.connections = {};
         this.mocks = new Mocks(false);
         this.app = this.bootstrap(express());
+
+        this.printTransactions = this.printTransactions.bind(this);
     }
 
     bootstrap(app) {
-        app.use((req, res, next) => {
+        app.use(async (req, res) => {
+            this.transactionsCount++;
             'use strict';
             var isJavaScript = /\.js$/.test(req.url);
             if (isJavaScript) {
@@ -33,34 +36,60 @@ class Server {
                 }));
             } else {
                 if (response.headers) {
-                    for (var hKey in response.headers) {
-                        res.setHeader(hKey, response.headers[hKey]);
-                        debug('            with response header: %s=%s ', hKey, response.headers[hKey]);
+                    if(response.headers.push) {
+                        for (let {name, value} of response.headers) {
+                            debug('            with response header: %s=%s ', name, value);
+                            res.setHeader(name, value);
+                        }
+                    } else {
+                        for (let [key, value] of Object.entries(response.headers)) {
+                            debug('            with response header: %s=%s ', key, value);
+                            res.setHeader(key, value);
+                        }
                     }
                 }
 
                 res.status(response.status);
 
-                if (response.content.startsWith && !response.content.startsWith('{')) {
-                    res.setHeader('Content-Type', 'text/plain;charset=UTF-8');
-                }
+                if (response.content)
+                    if (response.content.startsWith && !response.content.startsWith('{')) {
+                        res.setHeader('Content-Type', 'text/plain;charset=UTF-8');
+                    }
 
                 if (isJavaScript) {
                     return res.end(response.content);
                 } else {
                     var body = response.content;
-                    debug(body);
+                    // debug(body);
+
+                    let responseTime = 100 + (Math.random() * 1900);
+                    debug(`Response time: ${responseTime}`)
+                    await new Promise(resolve => setTimeout(resolve, responseTime))
+
                     res.end(body);
                 }
             }
 
-            next();
+            // next();
             //debug(req.url + ' -> ' + (body.length < 1024 ? body : 'Lång json-sträng'));
         });
 
         return app;
     }
+
+    transactionsCount = 0;
+    printTimeout = null;
+
+    printTransactions() {
+        if (this.printTimeout === false) {
+            return;
+        }
+        debug(`Total transactions: ${this.transactionsCount}`);
+        this.printTimeout = setTimeout(this.printTransactions, 10000);
+    }
+
     start() {
+        this.printTransactions();
         return new Promise(resolve => {
             this.server = this.app.listen(process.env.MOCKPORT || 4129, () => {
                 var host = this.server.address().address;
@@ -75,7 +104,7 @@ class Server {
                 var key = conn.remoteAddress + ':' + conn.remotePort;
                 debug(`Connection established with ${key}`)
                 this.connections[key] = conn;
-                conn.on('close', function() {
+                conn.on('close', function () {
                     try {
                         delete this.connections[key];
                     } catch (e) {
@@ -102,6 +131,8 @@ class Server {
     }
 
     stop() {
+        clearTimeout(this.printTimeout);
+        this.printTimeout = false;
         debug('stop');
         const unusedMocks = this.mocks.getUnusedMocks();
 

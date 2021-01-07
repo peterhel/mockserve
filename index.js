@@ -103,6 +103,9 @@ class Server {
             this.server.on('connection', conn => {
                 var key = conn.remoteAddress + ':' + conn.remotePort;
                 debug(`Connection established with ${key}`)
+                conn.on('data', data => {
+                    console.log(data.toString('ascii'))
+                })
                 this.connections[key] = conn;
                 conn.on('close', function () {
                     try {
